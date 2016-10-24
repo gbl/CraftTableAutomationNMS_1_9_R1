@@ -6,6 +6,7 @@
 package de.guntram.bukkit.crafttableautomation.helpers;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import net.minecraft.server.v1_9_R1.BlockPosition;
@@ -16,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftShapedRecipe;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftShapelessRecipe;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
@@ -67,10 +69,17 @@ public class CraftItemEventHelper_1_9_R1 implements CraftItemEventHelper {
     }
 
     @Override
-    public Map<Character, ItemStack> getIngredientMap(Recipe recipe) {
-        if (recipe instanceof CraftShapedRecipe)
-            return ((CraftShapedRecipe)recipe).getIngredientMap();
-        else
+    public Collection<ItemStack> getIngredientCollection(Recipe recipe) {
+        getLogger().log(Level.FINE, "recipe is "+recipe.toString());
+        if (recipe instanceof CraftShapedRecipe) {
+            Map<Character, ItemStack> map=((CraftShapedRecipe)recipe).getIngredientMap();
+            getLogger().log(Level.FINE, "map is "+map.toString());
+            return map.values();
+        } else if (recipe instanceof CraftShapelessRecipe) {
+            return ((CraftShapelessRecipe)recipe).getIngredientList();
+        } else {
+            getLogger().log(Level.WARNING, "recipe class is " + recipe.getClass().getCanonicalName());
             return null;
+        }
     }
 }
